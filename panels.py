@@ -78,7 +78,7 @@ def _connect_section() -> ui.UINode:
                     ui.Text("Instance base URL", variant="caption"),
                     ui.Input(param_name="base_url",
                              placeholder="https://gitlab.com or https://gitlab.example.com",
-                             default_value="https://gitlab.com"),
+                             value="https://gitlab.com"),
                 ]),
                 ui.Stack(direction="v", gap=1, align="stretch", children=[
                     ui.Text("Personal Access Token", variant="caption"),
