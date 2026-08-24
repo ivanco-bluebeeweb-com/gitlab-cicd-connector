@@ -133,26 +133,30 @@ async def connect_gitlab(ctx, params: ConnectGitlabParams) -> ActionResult:
     if not params.access_token:
         return ActionResult.error("Please provide your GitLab Personal Access Token.", code="GITLAB_MISSING_TOKEN")
     try:
-        user = await gc.check_connection(ctx, params.base_url, params.access_token)
+        base_url = gc.normalize_base_url(params.base_url, params.allow_private_http)
+    except gc.ProviderError as e:
+        return _err("Could not connect", e)
+    try:
+        user = await gc.check_connection(ctx, base_url, params.access_token)
     except gc.ProviderError as e:
         return _err("Could not connect", e)
 
     connections = await _load_connections(ctx)
     conn_id = str(uuid.uuid4())
-    label = params.label or user.get("username") or params.base_url
+    label = params.label or user.get("username") or base_url
     connections.append({
         "id": conn_id,
         "title": label,
-        "base_url": params.base_url,
+        "base_url": base_url,
         "access_token": params.access_token,
-        "detail": f"{params.base_url} -- {user.get('username', '')}",
+        "detail": f"{base_url} -- {user.get('username', '')}",
     })
     await _save_connections(ctx, connections)
     return ActionResult.success(
         ProviderConnection(id=conn_id, title=label, connected=True,
                             detail=f"Connected as {user.get('username', '')}",
-                            base_url=params.base_url),
-        summary=f"GitLab connected -- {params.base_url}.",
+                            base_url=base_url),
+        summary=f"GitLab connected -- {base_url}.",
         refresh_panels=["gitlab_connect", "gitlab_settings"],
     )
 
@@ -1913,7 +1917,7 @@ async def bulk_retry_pipelines(ctx, params: BulkPipelineIdsParams) -> ActionResu
     "bulk_cancel_pipelines",
     "Cancel several running pipelines in one call, by explicit pipeline ids. "
     "Continues past per-item failures and reports which succeeded.",
-    action_type="write",
+    action_type="destructive",
     chain_callable=True,
     data_model=BulkResult,
     event="gitlab-cicd-connector.bulk_cancel_pipelines",
@@ -1959,7 +1963,7 @@ async def bulk_retry_jobs(ctx, params: BulkJobIdsParams) -> ActionResult:
 @chat.function(
     "bulk_cancel_jobs",
     "Cancel several running jobs in one call, by explicit job ids. Continues past per-item failures and reports which succeeded.",
-    action_type="write",
+    action_type="destructive",
     chain_callable=True,
     data_model=BulkJobResult,
     event="gitlab-cicd-connector.bulk_cancel_jobs",

@@ -28,6 +28,13 @@ class ConnectGitlabParams(BaseModel):
         "",
         description="Personal Access Token with 'api' or 'read_api' scope -- create it in User Settings > Access Tokens.",
     )
+    allow_private_http: bool = Field(
+        False,
+        description=(
+            "Set true to allow a plain http:// base_url for a self-managed "
+            "instance on localhost or a private network. HTTPS is required otherwise."
+        ),
+    )
     label: str = Field("", description="Optional friendly name for this instance connection.")
 
 
