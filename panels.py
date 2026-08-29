@@ -116,6 +116,9 @@ async def gitlab_connect_panel(ctx, **kwargs) -> object:
         ui.Text("Connected instances", variant="subtitle"),
         _connections_section(connections),
         ui.Divider(),
+        ui.Button("Open a project", variant="primary", size="sm", full_width=True,
+                  icon="GitBranch", on_click=ui.Call("__panel__gitlab_center")),
+        ui.Divider(),
         _connect_section(),
         ui.Divider(),
         _settings_button(),
@@ -157,15 +160,70 @@ async def gitlab_connect_help(ctx, **kwargs) -> object:
 
 
 @ext.panel("gitlab_center", slot="center", title="GitLab CI/CD", icon="🦊", center_overlay=True)
-async def gitlab_center_panel(ctx, **kwargs) -> object:
-    """Base center panel -- per UI_INTERFACE_STANDARD.md (2026-08-20).
-    This app has no list/detail content of its own to show in the center
-    by default (everything lives in the sidebar). MUST carry
-    center_overlay=True: per docs.imperal.io/en/concepts/panels, a plain
-    slot="center" panel is registered but the Panel app never fetches it
-    at session-init without that flag. Text is the shared canonical
-    wording -- must stay identical across every app in this situation."""
-    return ui.Empty(
-        message="Nothing to show here -- this app is managed entirely from the sidebar.",
-        icon="👈",
-    )
+async def gitlab_center_panel(ctx, project_id: str = "", **kwargs) -> object:
+    """Post-connect main screen: a project CI/CD health dashboard.
+
+    GitLab CI/CD Connector has no fleet-wide "list every project" tool
+    (every audit/pipeline/runner call is scoped to one project_id/path),
+    so unlike Shopify/Stripe/HubSpot (which have a natural top-level
+    list), this screen asks for a project path once via a plain Input +
+    Button, then renders audit_project_ci's real health report for it."""
+    connections = await h._load_connections(ctx)
+    if not connections:
+        return ui.Empty(
+            message="Connect a GitLab instance from the sidebar to audit a project here.",
+            icon="🦊",
+        )
+    if not project_id:
+        return ui.Stack(direction="v", gap=3, align="stretch", children=[
+            ui.Text("Open a project", variant="subtitle"),
+            ui.Text(
+                "Enter a GitLab project ID or URL-encoded path (e.g. "
+                "\"mygroup/myproject\") to see its pipeline health here.",
+                variant="caption",
+            ),
+            ui.Form(
+                action="__panel__gitlab_center",
+                submit_label="Open project",
+                children=[
+                    ui.Stack(direction="v", gap=1, align="stretch", children=[
+                        ui.Text("Project ID or path", variant="caption"),
+                        ui.Input(param_name="project_id", placeholder="mygroup/myproject"),
+                    ]),
+                ],
+            ),
+        ])
+    return await _project_dashboard(ctx, project_id)
+
+
+async def _project_dashboard(ctx, project_id: str) -> ui.UINode:
+    from schemas import AuditProjectCiParams
+    result = await h.audit_project_ci(ctx, AuditProjectCiParams(project_id=project_id))
+    if not result.success or not result.data:
+        return ui.Stack(direction="v", gap=3, align="stretch", children=[
+            ui.Button("← Choose a different project", variant="ghost", size="sm",
+                      on_click=ui.Call("__panel__gitlab_center")),
+            ui.Alert(title="Could not load this project",
+                     message=result.error or "Check the project ID/path and your token's access.",
+                     type="error"),
+        ])
+    r = result.data
+    rows_ui: list[ui.UINode] = []
+    for row in r.rows:
+        color = {"ok": "green", "warn": "yellow", "error": "red"}.get(row.status, "gray")
+        rows_ui.append(ui.Stack(direction="h", gap=2, align="center", children=[
+            ui.Badge(label=row.status.upper(), color=color),
+            ui.Text(f"{row.check} — {row.detail}", variant="caption"),
+        ]))
+    return ui.Stack(direction="v", gap=3, align="stretch", children=[
+        ui.Button("← Choose a different project", variant="ghost", size="sm",
+                  on_click=ui.Call("__panel__gitlab_center")),
+        ui.Stats(children=[
+            ui.Stat(label="Success rate", value=f"{r.success_rate_pct:.0f}%"),
+            ui.Stat(label="Failing pipelines", value=str(r.failing_pipelines)),
+            ui.Stat(label="Offline runners", value=str(r.offline_runners)),
+        ]),
+        ui.Divider(),
+        ui.Text(f"Project: {r.project_id}", variant="subtitle"),
+        *(rows_ui if rows_ui else [ui.Text("No audit checks returned.", variant="caption")]),
+    ])
