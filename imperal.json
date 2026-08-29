@@ -1,6 +1,6 @@
 {
   "manifest_schema_version": 3,
-  "sdk_version": "5.11.0",
+  "sdk_version": "5.13.0",
   "app_id": "gitlab-cicd-connector",
   "version": "0.1.0",
   "name": "GitLab CI/CD",
@@ -35,6 +35,12 @@
             "description": "Personal Access Token with 'api' or 'read_api' scope -- create it in User Settings > Access Tokens.",
             "title": "Access Token",
             "type": "string"
+          },
+          "allow_private_http": {
+            "default": false,
+            "description": "Set true to allow a plain http:// base_url for a self-managed instance on localhost or a private network. HTTPS is required otherwise.",
+            "title": "Allow Private Http",
+            "type": "boolean"
           },
           "label": {
             "default": "",
@@ -11105,7 +11111,7 @@
     {
       "name": "bulk_cancel_pipelines",
       "description": "Cancel several running pipelines in one call, by explicit pipeline ids. Continues past per-item failures and reports which succeeded.",
-      "action_type": "write",
+      "action_type": "destructive",
       "chain_callable": true,
       "effects": [
         "gitlab.pipeline.bulk_cancelled"
@@ -11565,7 +11571,7 @@
     {
       "name": "bulk_cancel_jobs",
       "description": "Cancel several running jobs in one call, by explicit job ids. Continues past per-item failures and reports which succeeded.",
-      "action_type": "write",
+      "action_type": "destructive",
       "chain_callable": true,
       "effects": [
         "gitlab.job.bulk_cancelled"
@@ -12310,7 +12316,7 @@
       "slot": "left",
       "title": "GitLab CI/CD",
       "tree": {},
-      "icon": "\ud83e\udd8a",
+      "icon": "🦊",
       "refresh": "manual",
       "center_overlay": false,
       "default_width": 320,
@@ -12331,7 +12337,7 @@
       "slot": "center",
       "title": "GitLab CI/CD",
       "tree": {},
-      "icon": "\ud83e\udd8a",
+      "icon": "🦊",
       "refresh": "manual",
       "center_overlay": true
     },
