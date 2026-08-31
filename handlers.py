@@ -199,7 +199,7 @@ async def list_connections(ctx, params: NoParams) -> ActionResult:
     items = [ProviderConnection(id=c.get("id", ""), title=c.get("title", ""), connected=True,
                                  detail=c.get("detail", ""), base_url=c.get("base_url", ""))
              for c in connections]
-    return ActionResult.success(ProviderConnectionList(connections=items))
+    return ActionResult.success(ProviderConnectionList(connections=items), summary="Connections listed.")
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -236,7 +236,7 @@ async def list_pipelines(ctx, params: ListPipelinesParams) -> ActionResult:
                        web_url=p.get("web_url", ""), created_at=p.get("created_at", ""),
                        updated_at=p.get("updated_at", ""))
              for p in (data if isinstance(data, list) else [])]
-    return ActionResult.success(PipelineList(pipelines=items))
+    return ActionResult.success(PipelineList(pipelines=items), summary="Pipelines listed.")
 
 
 @chat.function(
@@ -265,7 +265,7 @@ async def get_pipeline(ctx, params: GetPipelineParams) -> ActionResult:
         started_at=p.get("started_at") or "", finished_at=p.get("finished_at") or "",
         duration=p.get("duration") or 0, queued_duration=p.get("queued_duration") or 0,
         coverage=p.get("coverage") or "", web_url=p.get("web_url", ""),
-    ))
+    ), summary="Pipeline retrieved.")
 
 
 @chat.function(
@@ -288,7 +288,7 @@ async def get_pipeline_variables(ctx, params: GetPipelineVariablesParams) -> Act
     items = [PipelineVariable(key=v.get("key", ""), value=v.get("value", ""),
                                variable_type=v.get("variable_type", ""))
              for v in data] if isinstance(data, list) else []
-    return ActionResult.success(PipelineVariableList(variables=items))
+    return ActionResult.success(PipelineVariableList(variables=items), summary="Pipeline variables retrieved.")
 
 
 @chat.function(
@@ -318,7 +318,7 @@ async def get_pipeline_test_report(ctx, params: GetPipelineTestReportParams) -> 
         success_count=data.get("success_count", 0), failed_count=data.get("failed_count", 0),
         skipped_count=data.get("skipped_count", 0), error_count=data.get("error_count", 0),
         test_suites=suites,
-    ))
+    ), summary="Pipeline test report retrieved.")
 
 
 @chat.function(
@@ -475,7 +475,7 @@ async def list_project_jobs(ctx, params: ListProjectJobsParams) -> ActionResult:
     except gc.ProviderError as e:
         return _err("Could not list project jobs", e)
     items = _jobs_from(data)
-    return ActionResult.success(JobList(jobs=items))
+    return ActionResult.success(JobList(jobs=items), summary="Project jobs listed.")
 
 
 @chat.function(
@@ -501,7 +501,7 @@ async def list_pipeline_jobs(ctx, params: ListPipelineJobsParams) -> ActionResul
     except gc.ProviderError as e:
         return _err("Could not list pipeline jobs", e)
     items = _jobs_from(data)
-    return ActionResult.success(JobList(jobs=items))
+    return ActionResult.success(JobList(jobs=items), summary="Pipeline jobs listed.")
 
 
 @chat.function(
@@ -534,7 +534,7 @@ async def list_pipeline_bridges(ctx, params: ListPipelineBridgesParams) -> Actio
             downstream_project_id=(downstream.get("project_id", 0) if isinstance(downstream, dict) else 0),
             web_url=b.get("web_url", ""),
         ))
-    return ActionResult.success(PipelineBridgeList(bridges=items))
+    return ActionResult.success(PipelineBridgeList(bridges=items), summary="Pipeline bridges listed.")
 
 
 @chat.function(
@@ -554,7 +554,7 @@ async def get_job(ctx, params: GetJobParams) -> ActionResult:
         j = await gc.get_job(ctx, base_url, token, params.project_id, params.job_id)
     except gc.ProviderError as e:
         return _err("Could not get job", e)
-    return ActionResult.success(_job_entity(j))
+    return ActionResult.success(_job_entity(j), summary="Job retrieved.")
 
 
 @chat.function(
@@ -577,7 +577,7 @@ async def get_job_trace(ctx, params: GetJobTraceParams) -> ActionResult:
     lines = trace.splitlines()
     truncated = len(lines) > params.tail_lines
     tail = lines[-params.tail_lines:] if truncated else lines
-    return ActionResult.success(JobTrace(job_id=params.job_id, trace="\n".join(tail), truncated=truncated))
+    return ActionResult.success(JobTrace(job_id=params.job_id, trace="\n".join(tail), truncated=truncated), summary="Job trace retrieved.")
 
 
 @chat.function(
@@ -717,7 +717,7 @@ async def list_runners(ctx, params: ListRunnersParams) -> ActionResult:
     except gc.ProviderError as e:
         return _err("Could not list runners", e)
     items = [_runner_entity(r) for r in (data if isinstance(data, list) else [])]
-    return ActionResult.success(RunnerList(runners=items))
+    return ActionResult.success(RunnerList(runners=items), summary="Runners listed.")
 
 
 @chat.function(
@@ -746,7 +746,7 @@ async def get_runner(ctx, params: GetRunnerParams) -> ActionResult:
         locked=r.get("locked", False), access_level=r.get("access_level", ""),
         version=r.get("version", ""), ip_address=r.get("ip_address", ""),
         maximum_timeout=r.get("maximum_timeout", 0) or 0, contacted_at=r.get("contacted_at", "") or "",
-    ))
+    ), summary="Runner retrieved.")
 
 
 @chat.function(
@@ -843,7 +843,7 @@ async def list_runner_jobs(ctx, params: ListRunnerJobsParams) -> ActionResult:
         data = await gc.list_runner_jobs(ctx, base_url, token, params.runner_id, **filters)
     except gc.ProviderError as e:
         return _err("Could not list runner jobs", e)
-    return ActionResult.success(JobList(jobs=_jobs_from(data)))
+    return ActionResult.success(JobList(jobs=_jobs_from(data)), summary="Runner jobs listed.")
 
 
 @chat.function(
@@ -864,7 +864,7 @@ async def list_project_runners(ctx, params: ListProjectRunnersParams) -> ActionR
     except gc.ProviderError as e:
         return _err("Could not list project runners", e)
     items = [_runner_entity(r) for r in (data if isinstance(data, list) else [])]
-    return ActionResult.success(RunnerList(runners=items))
+    return ActionResult.success(RunnerList(runners=items), summary="Project runners listed.")
 
 
 @chat.function(
@@ -953,7 +953,7 @@ async def list_project_variables(ctx, params: ListProjectVariablesParams) -> Act
     except gc.ProviderError as e:
         return _err("Could not list project variables", e)
     items = [_variable_entity(v) for v in (data if isinstance(data, list) else [])]
-    return ActionResult.success(VariableList(variables=items))
+    return ActionResult.success(VariableList(variables=items), summary="Project variables listed.")
 
 
 @chat.function(
@@ -974,7 +974,7 @@ async def get_project_variable(ctx, params: GetProjectVariableParams) -> ActionR
         v = await gc.get_project_variable(ctx, base_url, token, params.project_id, params.key, **filters)
     except gc.ProviderError as e:
         return _err("Could not get project variable", e)
-    return ActionResult.success(_variable_entity(v))
+    return ActionResult.success(_variable_entity(v), summary="Project variable retrieved.")
 
 
 @chat.function(
@@ -1080,7 +1080,7 @@ async def list_group_variables(ctx, params: ListGroupVariablesParams) -> ActionR
     except gc.ProviderError as e:
         return _err("Could not list group variables", e)
     items = [_variable_entity(v) for v in (data if isinstance(data, list) else [])]
-    return ActionResult.success(VariableList(variables=items))
+    return ActionResult.success(VariableList(variables=items), summary="Group variables listed.")
 
 
 @chat.function(
@@ -1100,7 +1100,7 @@ async def get_group_variable(ctx, params: GetGroupVariableParams) -> ActionResul
         v = await gc.get_group_variable(ctx, base_url, token, params.group_id, params.key)
     except gc.ProviderError as e:
         return _err("Could not get group variable", e)
-    return ActionResult.success(_variable_entity(v))
+    return ActionResult.success(_variable_entity(v), summary="Group variable retrieved.")
 
 
 @chat.function(
@@ -1209,7 +1209,7 @@ async def list_pipeline_triggers(ctx, params: ListTriggersParams) -> ActionResul
     except gc.ProviderError as e:
         return _err("Could not list pipeline triggers", e)
     items = [_trigger_entity(t) for t in (data if isinstance(data, list) else [])]
-    return ActionResult.success(TriggerList(triggers=items))
+    return ActionResult.success(TriggerList(triggers=items), summary="Pipeline triggers listed.")
 
 
 @chat.function(
@@ -1347,7 +1347,7 @@ async def list_pipeline_schedules(ctx, params: ListPipelineSchedulesParams) -> A
     except gc.ProviderError as e:
         return _err("Could not list pipeline schedules", e)
     items = [_schedule_entity(s) for s in (data if isinstance(data, list) else [])]
-    return ActionResult.success(PipelineScheduleList(schedules=items))
+    return ActionResult.success(PipelineScheduleList(schedules=items), summary="Pipeline schedules listed.")
 
 
 @chat.function(
@@ -1367,7 +1367,7 @@ async def get_pipeline_schedule(ctx, params: GetPipelineScheduleParams) -> Actio
         s = await gc.get_pipeline_schedule(ctx, base_url, token, params.project_id, params.schedule_id)
     except gc.ProviderError as e:
         return _err("Could not get pipeline schedule", e)
-    return ActionResult.success(_schedule_entity(s))
+    return ActionResult.success(_schedule_entity(s), summary="Pipeline schedule retrieved.")
 
 
 @chat.function(
@@ -1545,7 +1545,7 @@ async def lint_ci_yaml(ctx, params: LintCiYamlParams) -> ActionResult:
         valid=data.get("valid", False), errors=data.get("errors") or [], warnings=data.get("warnings") or [],
         merged_yaml=data.get("merged_yaml", "") or "",
         job_names=[j.get("name", "") for j in (data.get("jobs") or [])] if data.get("jobs") else [],
-    ))
+    ), summary="Lint ci yaml done.")
 
 
 @chat.function(
@@ -1569,7 +1569,7 @@ async def project_lint_ci_yaml(ctx, params: ProjectLintCiYamlParams) -> ActionRe
     return ActionResult.success(LintResult(
         valid=data.get("valid", False), errors=data.get("errors") or [], warnings=data.get("warnings") or [],
         merged_yaml=data.get("merged_yaml", "") or "", job_names=[],
-    ))
+    ), summary="Project lint ci yaml done.")
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -1595,7 +1595,7 @@ async def get_job_artifacts_url(ctx, params: GetJobArtifactsParams) -> ActionRes
     return ActionResult.success(ArtifactsInfo(
         job_id=params.job_id, download_url=url,
         note="Authenticate with your GitLab Personal Access Token (PRIVATE-TOKEN header) when fetching this URL.",
-    ))
+    ), summary="Job artifacts url retrieved.")
 
 
 @chat.function(
@@ -1679,7 +1679,7 @@ async def list_environments(ctx, params: ListEnvironmentsParams) -> ActionResult
     except gc.ProviderError as e:
         return _err("Could not list environments", e)
     items = [_environment_entity(e) for e in (data if isinstance(data, list) else [])]
-    return ActionResult.success(EnvironmentList(environments=items))
+    return ActionResult.success(EnvironmentList(environments=items), summary="Environments listed.")
 
 
 @chat.function(
@@ -1699,7 +1699,7 @@ async def get_environment(ctx, params: GetEnvironmentParams) -> ActionResult:
         e = await gc.get_environment(ctx, base_url, token, params.project_id, params.environment_id)
     except gc.ProviderError as e2:
         return _err("Could not get environment", e2)
-    return ActionResult.success(_environment_entity(e))
+    return ActionResult.success(_environment_entity(e), summary="Environment retrieved.")
 
 
 @chat.function(
@@ -1836,7 +1836,7 @@ async def list_deployments(ctx, params: ListDeploymentsParams) -> ActionResult:
     except gc.ProviderError as e:
         return _err("Could not list deployments", e)
     items = [_deployment_entity(d) for d in (data if isinstance(data, list) else [])]
-    return ActionResult.success(DeploymentList(deployments=items))
+    return ActionResult.success(DeploymentList(deployments=items), summary="Deployments listed.")
 
 
 @chat.function(
@@ -1856,7 +1856,7 @@ async def get_deployment(ctx, params: GetDeploymentParams) -> ActionResult:
         d = await gc.get_deployment(ctx, base_url, token, params.project_id, params.deployment_id)
     except gc.ProviderError as e:
         return _err("Could not get deployment", e)
-    return ActionResult.success(_deployment_entity(d))
+    return ActionResult.success(_deployment_entity(d), summary="Deployment retrieved.")
 
 
 @chat.function(
@@ -2034,5 +2034,5 @@ async def audit_project_ci(ctx, params: AuditProjectCiParams) -> ActionResult:
         success_rate_pct=data.get("success_rate_pct", 0.0), failing_pipelines=data.get("failing_pipelines", 0),
         stale_variables_flagged=data.get("stale_variables_flagged", False),
         offline_runners=data.get("offline_runners", 0),
-    ))
+    ), summary="Project ci audit ready.")
 
