@@ -47,6 +47,8 @@ class ProviderConnection(sdl.Entity):
 
 
 class ProviderConnectionList(sdl.Entity):
+    id: str = ""
+    title: str = ""
     connections: list[ProviderConnection] = []
 
 
@@ -55,6 +57,7 @@ class DisconnectGitlabParams(BaseModel):
 
 
 class DeleteResult(sdl.Entity):
+    title: str = ""
     deleted: bool = False
     id: str = ""
 
@@ -82,6 +85,7 @@ class ListPipelinesParams(BaseModel):
 
 
 class Pipeline(sdl.Entity):
+    title: str = ""
     id: int = 0
     iid: int = 0
     project_id: int = 0
@@ -96,6 +100,8 @@ class Pipeline(sdl.Entity):
 
 
 class PipelineList(sdl.Entity):
+    id: str = ""
+    title: str = ""
     pipelines: list[Pipeline] = []
     page: int = 1
     per_page: int = 20
@@ -108,6 +114,7 @@ class GetPipelineParams(BaseModel):
 
 
 class PipelineDetail(sdl.Entity):
+    title: str = ""
     id: int = 0
     iid: int = 0
     project_id: int = 0
@@ -156,6 +163,7 @@ class DeletePipelineParams(BaseModel):
 
 
 class PipelineActionResult(sdl.Entity):
+    title: str = ""
     id: int = 0
     status: str = ""
     web_url: str = ""
@@ -168,12 +176,16 @@ class GetPipelineVariablesParams(BaseModel):
 
 
 class PipelineVariable(sdl.Entity):
+    id: str = ""
+    title: str = ""
     key: str = ""
     value: str = ""
     variable_type: str = ""
 
 
 class PipelineVariableList(sdl.Entity):
+    id: str = ""
+    title: str = ""
     variables: list[PipelineVariable] = []
 
 
@@ -184,6 +196,8 @@ class GetPipelineTestReportParams(BaseModel):
 
 
 class TestSuiteSummary(sdl.Entity):
+    id: str = ""
+    title: str = ""
     name: str = ""
     total_count: int = 0
     success_count: int = 0
@@ -193,6 +207,8 @@ class TestSuiteSummary(sdl.Entity):
 
 
 class PipelineTestReport(sdl.Entity):
+    id: str = ""
+    title: str = ""
     total_time: float = 0.0
     total_count: int = 0
     success_count: int = 0
@@ -227,6 +243,7 @@ class ListPipelineJobsParams(BaseModel):
 
 
 class Job(sdl.Entity):
+    title: str = ""
     id: int = 0
     name: str = ""
     stage: str = ""
@@ -243,6 +260,8 @@ class Job(sdl.Entity):
 
 
 class JobList(sdl.Entity):
+    id: str = ""
+    title: str = ""
     jobs: list[Job] = []
 
 
@@ -260,6 +279,8 @@ class GetJobTraceParams(BaseModel):
 
 
 class JobTrace(sdl.Entity):
+    id: str = ""
+    title: str = ""
     job_id: int = 0
     trace: str = ""
     truncated: bool = False
@@ -272,6 +293,7 @@ class JobActionParams(BaseModel):
 
 
 class JobActionResult(sdl.Entity):
+    title: str = ""
     id: int = 0
     status: str = ""
     web_url: str = ""
@@ -285,6 +307,7 @@ class ListPipelineBridgesParams(BaseModel):
 
 
 class PipelineBridge(sdl.Entity):
+    title: str = ""
     id: int = 0
     name: str = ""
     stage: str = ""
@@ -295,6 +318,8 @@ class PipelineBridge(sdl.Entity):
 
 
 class PipelineBridgeList(sdl.Entity):
+    id: str = ""
+    title: str = ""
     bridges: list[PipelineBridge] = []
 
 
@@ -310,6 +335,8 @@ class GetJobArtifactsParams(BaseModel):
 
 
 class ArtifactsInfo(sdl.Entity):
+    id: str = ""
+    title: str = ""
     job_id: int = 0
     download_url: str = ""
     note: str = ""
@@ -344,6 +371,7 @@ class ListRunnersParams(BaseModel):
 
 
 class Runner(sdl.Entity):
+    title: str = ""
     id: int = 0
     description: str = ""
     active: bool = False
@@ -356,6 +384,8 @@ class Runner(sdl.Entity):
 
 
 class RunnerList(sdl.Entity):
+    id: str = ""
+    title: str = ""
     runners: list[Runner] = []
 
 
@@ -365,6 +395,7 @@ class GetRunnerParams(BaseModel):
 
 
 class RunnerDetail(sdl.Entity):
+    title: str = ""
     id: int = 0
     description: str = ""
     active: bool = False
@@ -439,6 +470,8 @@ class ListProjectVariablesParams(BaseModel):
 
 
 class Variable(sdl.Entity):
+    id: str = ""
+    title: str = ""
     key: str = ""
     value: str = ""
     variable_type: str = ""
@@ -451,6 +484,8 @@ class Variable(sdl.Entity):
 
 
 class VariableList(sdl.Entity):
+    id: str = ""
+    title: str = ""
     variables: list[Variable] = []
 
 
@@ -548,6 +583,7 @@ class ListTriggersParams(BaseModel):
 
 
 class Trigger(sdl.Entity):
+    title: str = ""
     id: int = 0
     description: str = ""
     token: str = ""
@@ -557,6 +593,8 @@ class Trigger(sdl.Entity):
 
 
 class TriggerList(sdl.Entity):
+    id: str = ""
+    title: str = ""
     triggers: list[Trigger] = []
 
 
@@ -601,6 +639,7 @@ class ListPipelineSchedulesParams(BaseModel):
 
 
 class PipelineSchedule(sdl.Entity):
+    title: str = ""
     id: int = 0
     description: str = ""
     ref: str = ""
@@ -612,6 +651,8 @@ class PipelineSchedule(sdl.Entity):
 
 
 class PipelineScheduleList(sdl.Entity):
+    id: str = ""
+    title: str = ""
     schedules: list[PipelineSchedule] = []
 
 
@@ -691,6 +732,8 @@ class ProjectLintCiYamlParams(BaseModel):
 
 
 class LintResult(sdl.Entity):
+    id: str = ""
+    title: str = ""
     valid: bool = False
     errors: list[str] = []
     warnings: list[str] = []
@@ -710,6 +753,8 @@ class GetJobArtifactsParams(BaseModel):
 
 
 class ArtifactsInfo(sdl.Entity):
+    id: str = ""
+    title: str = ""
     job_id: int = 0
     available: bool = False
     filename: str = ""
@@ -744,6 +789,7 @@ class ListEnvironmentsParams(BaseModel):
 
 
 class Environment(sdl.Entity):
+    title: str = ""
     id: int = 0
     name: str = ""
     slug: str = ""
@@ -755,6 +801,8 @@ class Environment(sdl.Entity):
 
 
 class EnvironmentList(sdl.Entity):
+    id: str = ""
+    title: str = ""
     environments: list[Environment] = []
 
 
@@ -794,6 +842,7 @@ class StopEnvironmentParams(BaseModel):
 
 
 class EnvironmentActionResult(sdl.Entity):
+    title: str = ""
     id: int = 0
     name: str = ""
     state: str = ""
@@ -816,6 +865,7 @@ class ListDeploymentsParams(BaseModel):
 
 
 class Deployment(sdl.Entity):
+    title: str = ""
     id: int = 0
     iid: int = 0
     ref: str = ""
@@ -829,6 +879,8 @@ class Deployment(sdl.Entity):
 
 
 class DeploymentList(sdl.Entity):
+    id: str = ""
+    title: str = ""
     deployments: list[Deployment] = []
 
 
@@ -859,6 +911,8 @@ class BulkPipelineIdsParams(BaseModel):
 
 
 class BulkResultItem(sdl.Entity):
+    id: str = ""
+    title: str = ""
     pipeline_id: int = 0
     ok: bool = False
     status: str = ""
@@ -866,6 +920,8 @@ class BulkResultItem(sdl.Entity):
 
 
 class BulkResult(sdl.Entity):
+    id: str = ""
+    title: str = ""
     results: list[BulkResultItem] = []
     succeeded: int = 0
     failed: int = 0
@@ -878,6 +934,8 @@ class BulkJobIdsParams(BaseModel):
 
 
 class BulkJobResultItem(sdl.Entity):
+    id: str = ""
+    title: str = ""
     job_id: int = 0
     ok: bool = False
     status: str = ""
@@ -885,6 +943,8 @@ class BulkJobResultItem(sdl.Entity):
 
 
 class BulkJobResult(sdl.Entity):
+    id: str = ""
+    title: str = ""
     results: list[BulkJobResultItem] = []
     succeeded: int = 0
     failed: int = 0
@@ -902,12 +962,16 @@ class AuditProjectCiParams(BaseModel):
 
 
 class AuditRow(sdl.Entity):
+    id: str = ""
+    title: str = ""
     check: str = ""
     status: str = ""
     detail: str = ""
 
 
 class AuditReport(sdl.Entity):
+    id: str = ""
+    title: str = ""
     project_id: str = ""
     generated_at: str = ""
     rows: list[AuditRow] = []
@@ -924,6 +988,8 @@ class GetFailedJobsSummaryParams(BaseModel):
 
 
 class FailedJobSummaryRow(sdl.Entity):
+    id: str = ""
+    title: str = ""
     pipeline_id: int = 0
     job_id: int = 0
     job_name: str = ""
@@ -933,5 +999,7 @@ class FailedJobSummaryRow(sdl.Entity):
 
 
 class FailedJobsSummary(sdl.Entity):
+    id: str = ""
+    title: str = ""
     rows: list[FailedJobSummaryRow] = []
     total_failed: int = 0
