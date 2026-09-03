@@ -37,8 +37,7 @@ def _settings_button() -> ui.UINode:
     """The one required secondary entry point into the settings screen --
     always the last element at the bottom of the sidebar."""
     return ui.Button(
-        "App settings", variant="secondary", size="sm", full_width=True,
-        icon="settings", on_click=ui.Call("__panel__gitlab_settings"),
+        "App settings", variant="secondary", size="sm", icon="settings", on_click=ui.Call("__panel__gitlab_settings"),
     )
 
 
@@ -70,6 +69,9 @@ def _connect_section() -> ui.UINode:
         ui.Button("How do I set this up?", variant="ghost", size="sm",
                   icon="HelpCircle",
                   on_click=ui.Call("__panel__gitlab_connect_help")),
+        ui.Button("Authorize with GitLab (OAuth 2.0)", variant="primary", size="sm", icon="login"),
+        ui.Divider(),
+        ui.Text("Or connect via Personal Access Token", variant="caption"),
         ui.Form(
             action="connect_gitlab",
             submit_label="Verify and connect",
@@ -116,8 +118,7 @@ async def gitlab_connect_panel(ctx, **kwargs) -> object:
         ui.Text("Connected instances", variant="subtitle"),
         _connections_section(connections),
         ui.Divider(),
-        ui.Button("Open a project", variant="primary", size="sm", full_width=True,
-                  icon="GitBranch", on_click=ui.Call("__panel__gitlab_center")),
+        ui.Button("Open a project", variant="primary", size="sm", icon="GitBranch", on_click=ui.Call("__panel__gitlab_center")),
         ui.Divider(),
         _connect_section(),
         ui.Divider(),
